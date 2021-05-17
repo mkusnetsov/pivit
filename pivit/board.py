@@ -1,10 +1,12 @@
 import pygame
 from .constants import BLACK, ROWS, RED, COLS, WHITE, DARKTILECOL, LIGHTTILECOL, WIDTH, PANELWIDTH, PANELHEIGHT
 from .piece import Cell, Piece
+from .players import Player, Players
 
 class Board:
     def __init__(self):
         self.board = []
+        self.players = Players([Player("Red", RED), Player("White", WHITE)])
         self.red_minions = self.white_minions = 12
         self.red_masters = self.white_masters = 0
         self.first_master = None
@@ -72,16 +74,16 @@ class Board:
 
         if self.is_mastery_tile(row, col):
             piece.make_master()
-            if piece.colour == WHITE:
+            if piece.player == self.players["White"]:
                 self.white_masters += 1
                 self.white_minions -= 1
                 if self.first_master is None:
-                    self.first_master = WHITE
+                    self.first_master = self.players["White"]
             else:
                 self.red_masters += 1 
                 self.red_minions -= 1 
                 if self.first_master is None:
-                    self.first_master = RED
+                    self.first_master = self.players["Red"]
 
     def create_board(self):
         for row in range(ROWS):
@@ -96,14 +98,14 @@ class Board:
 
                 if self.is_starting_white(row, col):
                     if self.starts_lateral(row, col):
-                        piece = Piece(row, col, WHITE, True)
+                        piece = Piece(row, col, self.players["White"], True)
                     else:
-                        piece = Piece(row, col, WHITE, False)
+                        piece = Piece(row, col, self.players["White"], False)
                 elif self.is_starting_red(row, col):
                     if self.starts_lateral(row, col):
-                        piece = Piece(row, col, RED, True)
+                        piece = Piece(row, col, self.players["Red"], True)
                     else:
-                        piece = Piece(row, col, RED, False)
+                        piece = Piece(row, col, self.players["Red"], False)
                 else:
                     piece = None
 
@@ -120,28 +122,28 @@ class Board:
         row, col = piece.row, piece.col
         cell = self.get_cell(row, col)
         cell.remove_piece()
-        # self.board[row][col] = cell
+
         if piece is not None:
-            if piece.colour == RED and piece.master:
+            if piece.player == self.players["Red"] and piece.master:
                 self.red_masters -= 1
-            elif piece.colour == WHITE and piece.master:
+            elif piece.player == self.players["White"] and piece.master:
                 self.white_masters -= 1
-            if piece.colour == RED and not piece.master:
+            if piece.player == self.players["Red"] and not piece.master:
                 self.red_minions -= 1
-            elif piece.colour == WHITE and not piece.master:
+            elif piece.player == self.players["White"] and not piece.master:
                 self.white_minions -= 1
     
     def winner(self):
         if self.red_minions + self.red_masters == 0:
-            return WHITE
+            return self.players["White"]
         elif self.white_minions + self.white_masters == 0:
-            return RED
+            return self.players["Red"]
             
         if self.red_minions + self.white_minions == 0:
             if self.red_masters > self.white_masters:
-                return RED
+                return self.players["Red"]
             elif self.red_masters < self.white_masters:
-                return WHITE
+                return self.players["White"]
             elif self.first_master is not None:
                 return self.first_master
             else:
@@ -179,7 +181,7 @@ class Board:
 
             if current_piece is not None:
                 encountered_piece = True
-            encountered_own = piece.same_colour(current_piece)
+            encountered_own = piece.same_side(current_piece)
             permissible_shift = (piece.master == True or shift_size % 2 != 0)
 
             if not encountered_own and permissible_shift:

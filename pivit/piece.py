@@ -1,5 +1,5 @@
-from .constants import RED, WHITE, SQUARE_SIZE, GREY
 import pygame
+from .constants import RED, WHITE, SQUARE_SIZE, GREY
 
 class Cell:
     def __init__(self, row, col, tilecolour, masterytile, piece):
@@ -36,10 +36,11 @@ class Piece:
     MINORFACTOR = 0.5 # Length of the minor axis of the diamond relative to the major axis
     NEUTRALCOLOUR = GREY
 
-    def __init__(self, row, col, colour, lateral):
+    def __init__(self, row, col, player, lateral):
         self.row = row
         self.col = col
-        self.colour = colour
+        self.player = player
+        self.colour = player.colour
         self.master = False
         self.x = 0
         self.y = 0
@@ -96,11 +97,11 @@ class Piece:
         self.calc_pos()
         self.pivot()
 
-    def same_colour(self, piece):
+    def same_side(self, piece):
         if piece is None:
             return False
         else:
-            return self.colour == piece.colour
+            return self.player == piece.player
 
     def __repr__(self):
-        return str(self.colour)
+        return str(self.player.name)

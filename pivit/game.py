@@ -1,6 +1,7 @@
 import pygame
 from .constants import RED, WHITE, BLUE, SQUARE_SIZE, ROWS, COLS
 from .board import Board
+# from .players import Player, Players
 
 class Game:
     def __init__(self, win):
@@ -15,7 +16,8 @@ class Game:
     def _init(self):
         self.selected = None
         self.board = Board()
-        self.turn = RED
+        self.players = self.board.players
+        self.turn = self.players.starting()
         self.valid_moves = []
 
     def winner(self):
@@ -35,7 +37,7 @@ class Game:
                 self.select(row, col)
         
         piece = self.board.get_piece(row, col)
-        if piece is not None and piece.colour == self.turn:
+        if piece is not None and piece.player == self.turn:
             self.selected = piece
             self.valid_moves = self.board.get_valid_moves(piece)
             return True
@@ -63,7 +65,7 @@ class Game:
 
     def change_turn(self):
         self.valid_moves = []
-        if self.turn == RED:
-            self.turn = WHITE
+        if self.turn == self.players["Red"]:
+            self.turn = self.players["White"]
         else:
-            self.turn = RED
+            self.turn = self.players["Red"]

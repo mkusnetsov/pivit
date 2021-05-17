@@ -1,6 +1,6 @@
 import pygame
-from .constants import BLACK, ROWS, RED, SQUARE_SIZE, COLS, WHITE, WIDTH
-from .piece import Piece
+from .constants import BLACK, ROWS, RED, COLS, WHITE, DARKTILECOL, LIGHTTILECOL, WIDTH, PANELWIDTH, PANELHEIGHT
+from .piece import Cell, Piece
 
 class Board:
     def __init__(self):
@@ -10,14 +10,11 @@ class Board:
         self.first_master = None
         self.first_capture = None
         self.create_board()
-    
-    def draw_squares(self, win):
-        win.fill(BLACK)
-        for row in range(ROWS):
-            for col in range(row % 2, COLS, 2):
-                pygame.draw.rect(win, RED, (row*SQUARE_SIZE, col *SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
     def display_info(self, win):
+        panelsurf = pygame.Surface((PANELWIDTH, PANELHEIGHT))
+        panelsurf.fill(color=RED)
+
         fontsize = 15
         font = pygame.font.Font(pygame.font.get_default_font(), fontsize)
 
@@ -30,16 +27,50 @@ class Board:
         inforenders = [font.render(s, True, WHITE) for s in infostrings]
 
         for i in range(len(inforenders)):
-            win.blit(inforenders[i], dest = (WIDTH + 10, 10 + (i * (fontsize + 15))))
+            panelsurf.blit(inforenders[i], dest = (10, 10 + (i * (fontsize + 15))))
 
-    def is_corner(self, row, col):
+        win.blit(panelsurf, dest = (WIDTH, 0))
+
+    def is_mastery_tile(self, row, col):
         return (row == ROWS - 1 or row == 0) and (col == ROWS - 1 or col == 0)
 
+    def starts_lateral(self, row, col):
+        return col == 0 or col == COLS-1
+
+    def is_starting_white(self, row, col):
+        if col == 0 or col == COLS-1:
+            if row in [1, 3, 4, 6]:
+                return True
+        elif row == 0 or row == ROWS-1:
+            if col in [2, 5]:
+                return True
+        return False
+
+    def is_starting_red(self, row, col):
+        if col == 0 or col == COLS-1:
+            if row in [2, 5]:
+                return True
+        elif row == 0 or row == ROWS-1:
+            if col in [1, 3, 4, 6]:
+                return True
+        return False
+
+    def get_cell(self, row, col):
+        return self.board[row][col]
+
+    def get_piece(self, row, col):
+        cell = self.get_cell(row, col)
+        return cell.piece
+
     def move(self, piece, row, col):
-        self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
+        source_cell = self.get_cell(piece.row, piece.col)
+        target_cell = self.get_cell(row, col)
+        target_cell.add_piece(piece)
+        source_cell.remove_piece()
+
         piece.move(row, col)
 
-        if self.is_corner(row, col):
+        if self.is_mastery_tile(row, col):
             piece.make_master()
             if piece.colour == WHITE:
                 self.white_masters += 1
@@ -52,43 +83,45 @@ class Board:
                 if self.first_master is None:
                     self.first_master = RED
 
-    def get_piece(self, row, col):
-        return self.board[row][col]
-
     def create_board(self):
         for row in range(ROWS):
             self.board.append([])
             for col in range(COLS):
-                if col == 0 or col == COLS-1:
-                    print(f"{col},{row}")
-                    if row in [2, 5]:
-                        self.board[row].append(Piece(row, col, RED, True))
-                    elif row in [1, 3, 4, 6]:
-                        self.board[row].append(Piece(row, col, WHITE, True))
-                    else:
-                        print(f"blank at: {col},{row}")
-                        self.board[row].append(0)
-                elif row == 0 or row == ROWS-1:
-                    if col in [1, 3, 4, 6]:
-                        self.board[row].append(Piece(row, col, RED, False))
-                    elif col in [2, 5]:
-                        self.board[row].append(Piece(row, col, WHITE, False))
+                if (row - col) % 2 == 0:
+                    tilecolour = DARKTILECOL
                 else:
-                    self.board[row].append(0)
+                    tilecolour = LIGHTTILECOL
+
+                masterytile = self.is_mastery_tile(row, col)
+
+                if self.is_starting_white(row, col):
+                    if self.starts_lateral(row, col):
+                        piece = Piece(row, col, WHITE, True)
+                    else:
+                        piece = Piece(row, col, WHITE, False)
+                elif self.is_starting_red(row, col):
+                    if self.starts_lateral(row, col):
+                        piece = Piece(row, col, RED, True)
+                    else:
+                        piece = Piece(row, col, RED, False)
+                else:
+                    piece = None
+
+                self.board[row].append(Cell(row, col, tilecolour, masterytile, piece))
         
     def draw(self, win):
-        self.draw_squares(win)
         for row in range(ROWS):
             for col in range(COLS):
-                piece = self.board[row][col]
-                if piece != 0:
-                    piece.draw(win)
+                cell = self.board[row][col]
+                cell.draw(win)
         self.display_info(win)
-        
 
     def remove(self, piece):
-        self.board[piece.row][piece.col] = 0
-        if piece != 0:
+        row, col = piece.row, piece.col
+        cell = self.get_cell(row, col)
+        cell.remove_piece()
+        # self.board[row][col] = cell
+        if piece is not None:
             if piece.colour == RED and piece.master:
                 self.red_masters -= 1
             elif piece.colour == WHITE and piece.master:
@@ -144,7 +177,7 @@ class Board:
 
             current_piece = self.get_piece(current_row, current_col)
 
-            if current_piece != 0:
+            if current_piece is not None:
                 encountered_piece = True
             encountered_own = piece.same_colour(current_piece)
             permissible_shift = (piece.master == True or shift_size % 2 != 0)

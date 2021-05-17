@@ -1,6 +1,6 @@
 import pygame
-from checkers.constants import WINWIDTH, WINHEIGHT, SQUARE_SIZE, RED
-from checkers.game import Game
+from pivit.constants import WINWIDTH, WINHEIGHT, SQUARE_SIZE, RED
+from pivit.game import Game
 
 FPS = 60
 

@@ -1,6 +1,6 @@
 import pygame
-from .constants import RED, WHITE, BLUE, SQUARE_SIZE
-from checkers.board import Board
+from .constants import RED, WHITE, BLUE, SQUARE_SIZE, ROWS, COLS
+from .board import Board
 
 class Game:
     def __init__(self, win):
@@ -25,6 +25,9 @@ class Game:
         self._init()
 
     def select(self, row, col):
+        if row < 0 or row >= ROWS or col < 0 or col >= COLS:
+            return False
+
         if self.selected:
             result = self._move(row, col)
             if not result:
@@ -32,7 +35,7 @@ class Game:
                 self.select(row, col)
         
         piece = self.board.get_piece(row, col)
-        if piece != 0 and piece.colour == self.turn:
+        if piece is not None and piece.colour == self.turn:
             self.selected = piece
             self.valid_moves = self.board.get_valid_moves(piece)
             return True
@@ -42,7 +45,7 @@ class Game:
     def _move(self, row, col):
         piece = self.board.get_piece(row, col)
         if self.selected and (row, col) in self.valid_moves:
-            if piece != 0:
+            if piece is not None:
                 if self.board.first_capture is None:
                     self.board.first_capture = self.turn
                 self.board.remove(piece)

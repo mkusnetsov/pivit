@@ -9,15 +9,25 @@ class Cell:
         self.masterytile = masterytile
         self.piece = piece
 
+    def _tile_rect(self):
+        tilex = self.col * SQUARE_SIZE
+        tiley = self.row * SQUARE_SIZE
+        return pygame.Rect(tilex, tiley, SQUARE_SIZE, SQUARE_SIZE)
+
     def _draw_tile(self, win):
-        tilex = self.row * SQUARE_SIZE
-        tiley = self.col * SQUARE_SIZE
-        pygame.draw.rect(win, self.tilecolour, (tilex, tiley, SQUARE_SIZE, SQUARE_SIZE))
+        pygame.draw.rect(win, self.tilecolour, self._tile_rect())
 
     def draw(self, win):
         self._draw_tile(win)
         if self.piece is not None:
             self.piece.draw(win)
+
+    def remove_piece(self):
+        self.piece = None
+    
+    def add_piece(self, piece):
+        self.piece = piece
+        
 
 class Piece:
     PADDING = 15
@@ -87,7 +97,7 @@ class Piece:
         self.pivot()
 
     def same_colour(self, piece):
-        if piece == 0:
+        if piece is None:
             return False
         else:
             return self.colour == piece.colour

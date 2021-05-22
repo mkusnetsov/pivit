@@ -1,5 +1,5 @@
 import pygame
-from .constants import RED, WHITE, BLUE, SQUARE_SIZE, ROWS, COLS
+from .constants import RED, WHITE, BLUE, SQUARE_SIZE, ROWS, COLS, WIDTH, PANELWIDTH, PANELHEIGHT
 from .board import Board
 # from .players import Player, Players
 
@@ -10,6 +10,7 @@ class Game:
     
     def update(self):
         self.board.draw(self.win)
+        self.display_info(self.win)
         self.draw_valid_moves(self.valid_moves)
         pygame.display.update()
 
@@ -69,3 +70,28 @@ class Game:
             self.turn = self.players["White"]
         else:
             self.turn = self.players["Red"]
+
+    def display_info(self, win):
+        panelsurf = pygame.Surface((PANELWIDTH, PANELHEIGHT))
+        panelsurf.fill(color=RED)
+
+        fontsize = 15
+        font = pygame.font.Font(pygame.font.get_default_font(), fontsize)
+
+        # infostrings = [
+        #     f"White Minions: {self.white_minions}",
+        #     f"White Masters: {self.white_masters}",
+        #     f"Red Minions: {self.red_minions}",
+        #     f"Red Masters: {self.red_masters}"
+        #     ]
+
+        minionstrings = [f"{name} Minions: {self.players[name].minions}" for name in self.players.names]
+        mastersstrings = [f"{name} Masters: {self.players[name].masters}" for name in self.players.names]
+        infostrings = [i for pair in zip(minionstrings, mastersstrings) for i in pair]
+
+        inforenders = [font.render(s, True, WHITE) for s in infostrings]
+
+        for i in range(len(inforenders)):
+            panelsurf.blit(inforenders[i], dest = (10, 10 + (i * (fontsize + 15))))
+
+        win.blit(panelsurf, dest = (WIDTH, 0))

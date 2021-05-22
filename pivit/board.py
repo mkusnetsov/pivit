@@ -1,5 +1,5 @@
 import pygame
-from .constants import BLACK, ROWS, RED, COLS, WHITE, DARKTILECOL, LIGHTTILECOL, WIDTH, PANELWIDTH, PANELHEIGHT
+from .constants import BLACK, ROWS, RED, COLS, WHITE, DARKTILECOL, LIGHTTILECOL
 from .piece import Cell, Piece
 from .players import Player, Players
 
@@ -12,31 +12,6 @@ class Board:
         self.first_master = None
         self.first_capture = None
         self.create_board()
-
-    def display_info(self, win):
-        panelsurf = pygame.Surface((PANELWIDTH, PANELHEIGHT))
-        panelsurf.fill(color=RED)
-
-        fontsize = 15
-        font = pygame.font.Font(pygame.font.get_default_font(), fontsize)
-
-        # infostrings = [
-        #     f"White Minions: {self.white_minions}",
-        #     f"White Masters: {self.white_masters}",
-        #     f"Red Minions: {self.red_minions}",
-        #     f"Red Masters: {self.red_masters}"
-        #     ]
-
-        minionstrings = [f"{name} Minions: {self.players[name].minions}" for name in self.players.names]
-        mastersstrings = [f"{name} Masters: {self.players[name].masters}" for name in self.players.names]
-        infostrings = [i for pair in zip(minionstrings, mastersstrings) for i in pair]
-
-        inforenders = [font.render(s, True, WHITE) for s in infostrings]
-
-        for i in range(len(inforenders)):
-            panelsurf.blit(inforenders[i], dest = (10, 10 + (i * (fontsize + 15))))
-
-        win.blit(panelsurf, dest = (WIDTH, 0))
 
     def is_mastery_tile(self, row, col):
         return (row == ROWS - 1 or row == 0) and (col == ROWS - 1 or col == 0)
@@ -113,7 +88,6 @@ class Board:
             for col in range(COLS):
                 cell = self.board[row][col]
                 cell.draw(win)
-        self.display_info(win)
 
     def remove(self, piece):
         row, col = piece.row, piece.col

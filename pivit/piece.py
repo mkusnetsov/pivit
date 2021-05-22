@@ -56,6 +56,7 @@ class Piece:
 
     def make_master(self):
         self.master = True
+        self.player.promote_piece()
 
     def diamond_coords(self, radius):
         halfmajorlen = radius * self.MAJORFACTOR

@@ -20,12 +20,17 @@ class Board:
         fontsize = 15
         font = pygame.font.Font(pygame.font.get_default_font(), fontsize)
 
-        infostrings = [
-            f"White Minions: {self.white_minions}",
-            f"White Masters: {self.white_masters}",
-            f"Red Minions: {self.red_minions}",
-            f"Red Masters: {self.red_masters}"
-            ]
+        # infostrings = [
+        #     f"White Minions: {self.white_minions}",
+        #     f"White Masters: {self.white_masters}",
+        #     f"Red Minions: {self.red_minions}",
+        #     f"Red Masters: {self.red_masters}"
+        #     ]
+
+        minionstrings = [f"{name} Minions: {self.players[name].minions}" for name in self.players.names]
+        mastersstrings = [f"{name} Masters: {self.players[name].masters}" for name in self.players.names]
+        infostrings = [i for pair in zip(minionstrings, mastersstrings) for i in pair]
+
         inforenders = [font.render(s, True, WHITE) for s in infostrings]
 
         for i in range(len(inforenders)):
@@ -74,16 +79,8 @@ class Board:
 
         if self.is_mastery_tile(row, col):
             piece.make_master()
-            if piece.player == self.players["White"]:
-                self.white_masters += 1
-                self.white_minions -= 1
-                if self.first_master is None:
-                    self.first_master = self.players["White"]
-            else:
-                self.red_masters += 1 
-                self.red_minions -= 1 
-                if self.first_master is None:
-                    self.first_master = self.players["Red"]
+            if self.first_master is None:
+                self.first_master = piece.player
 
     def create_board(self):
         for row in range(ROWS):
@@ -124,30 +121,31 @@ class Board:
         cell.remove_piece()
 
         if piece is not None:
-            if piece.player == self.players["Red"] and piece.master:
-                self.red_masters -= 1
-            elif piece.player == self.players["White"] and piece.master:
-                self.white_masters -= 1
-            if piece.player == self.players["Red"] and not piece.master:
-                self.red_minions -= 1
-            elif piece.player == self.players["White"] and not piece.master:
-                self.white_minions -= 1
+            if piece.master:
+                piece.player.lose_piece(master=True)
+            else:
+                piece.player.lose_piece(master=False)
+            self.players.update_active_number()
     
     def winner(self):
-        if self.red_minions + self.red_masters == 0:
-            return self.players["White"]
-        elif self.white_minions + self.white_masters == 0:
-            return self.players["Red"]
+        # if self.red_minions + self.red_masters == 0:
+        #     return self.players["White"]
+        # elif self.white_minions + self.white_masters == 0:
+        #     return self.players["Red"]
+
+        if self.players.active_number == 1:
+            return self.players.get_active_players()[0]
             
-        if self.red_minions + self.white_minions == 0:
-            if self.red_masters > self.white_masters:
-                return self.players["Red"]
-            elif self.red_masters < self.white_masters:
-                return self.players["White"]
-            elif self.first_master is not None:
-                return self.first_master
-            else:
-                return self.first_capture
+        if self.players.no_minions_left():
+            return self.players.winner_if_game_over()
+            # if self.red_masters > self.white_masters:
+            #     return self.players["Red"]
+            # elif self.red_masters < self.white_masters:
+            #     return self.players["White"]
+            # elif self.first_master is not None:
+            #     return self.first_master
+            # else:
+            #     return self.first_capture
         
         return None 
 

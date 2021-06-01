@@ -1,7 +1,5 @@
 from itertools import cycle
 
-from pygame import error
-
 class Player:
     STARTING_MINIONS = 12
     STARTING_MASTERS = 0
@@ -12,6 +10,7 @@ class Player:
         self.minions = self.STARTING_MINIONS
         self.masters = self.STARTING_MASTERS
         self.defeated = False
+        self.first_master = None
 
     def lose_piece(self, master):
         if master:
@@ -21,12 +20,28 @@ class Player:
         if self.masters + self.minions == 0:
             self.defeated = True
 
-    def promote_piece(self):
+    def promote_piece(self, turn):
         self.masters += 1
         self.minions -= 1
+        if self.first_master is None:
+            self.first_master = turn
 
     def __repr__(self):
         return self.name
+
+    def __lt__(self, other):
+        if other.defeated:
+            return False
+
+        if self.defeated:
+            return True
+
+        if self.masters != other.masters:
+            return self.masters < other.masters
+        elif self.masters == 0:
+            return False
+        else:
+            return self.first_master > other.first_master
 
 class Players:
     def __init__(self, players):
@@ -35,8 +50,8 @@ class Players:
         self.names = [p.name for p in players]
         self._players_cycle = cycle(players)
         self._players_dict = {p.name: p for p in players}
-        self._starting = players[0]
-        self._current = players[0]
+        self._starting = next(self._players_cycle)
+        self._current = self._starting
 
     def __getitem__(self, key):
         return self._players_dict[key]
@@ -48,7 +63,7 @@ class Players:
         return self._current
      
     def next(self):
-        self._current = next(self.players)
+        self._current = next(self._players_cycle)
         if self._current.defeated:
             return self.next()
         return self._current
@@ -67,10 +82,4 @@ class Players:
 
     def winner_if_game_over(self):
         active_players = self.get_active_players()
-        master_counts = [player.masters for player in active_players]
-        max_count = max(master_counts)
-        most_master_players = [player for player in active_players if player.masters == max_count]
-        if len(most_master_players) == 1:
-            return most_master_players[0]
-        else:
-            raise RuntimeError("Ties still need to be implemented")
+        return sorted(active_players, reverse=True)[0]

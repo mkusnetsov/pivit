@@ -1,4 +1,3 @@
-import pygame
 from .constants import BLACK, ROWS, RED, COLS, WHITE, DARKTILECOL, LIGHTTILECOL
 from .piece import Cell, Piece
 from .players import Player, Players
@@ -9,8 +8,6 @@ class Board:
         self.players = Players([Player("Red", RED), Player("White", WHITE)])
         self.red_minions = self.white_minions = 12
         self.red_masters = self.white_masters = 0
-        self.first_master = None
-        self.first_capture = None
         self.create_board()
 
     def is_mastery_tile(self, row, col):
@@ -44,7 +41,7 @@ class Board:
         cell = self.get_cell(row, col)
         return cell.piece
 
-    def move(self, piece, row, col):
+    def move(self, piece, row, col, turn):
         source_cell = self.get_cell(piece.row, piece.col)
         target_cell = self.get_cell(row, col)
         target_cell.add_piece(piece)
@@ -53,9 +50,7 @@ class Board:
         piece.move(row, col)
 
         if self.is_mastery_tile(row, col):
-            piece.make_master()
-            if self.first_master is None:
-                self.first_master = piece.player
+            piece.make_master(turn)
 
     def create_board(self):
         for row in range(ROWS):
@@ -101,25 +96,17 @@ class Board:
                 piece.player.lose_piece(master=False)
             self.players.update_active_number()
     
-    def winner(self):
-        # if self.red_minions + self.red_masters == 0:
-        #     return self.players["White"]
-        # elif self.white_minions + self.white_masters == 0:
-        #     return self.players["Red"]
-
+    def game_is_over(self):
         if self.players.active_number == 1:
-            return self.players.get_active_players()[0]
-            
-        if self.players.no_minions_left():
+            return True
+        elif self.players.no_minions_left():
+            return True
+        else:
+            return False
+
+    def winner(self):
+        if self.game_is_over():
             return self.players.winner_if_game_over()
-            # if self.red_masters > self.white_masters:
-            #     return self.players["Red"]
-            # elif self.red_masters < self.white_masters:
-            #     return self.players["White"]
-            # elif self.first_master is not None:
-            #     return self.first_master
-            # else:
-            #     return self.first_capture
         
         return None 
 

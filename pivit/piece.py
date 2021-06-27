@@ -1,5 +1,5 @@
 import pygame
-from .constants import HORIZONTALOFFSET, VERTICALOFFSET, SQUARE_SIZE, GREY
+from .constants import HORIZONTALOFFSET, VERTICALOFFSET, SQUARE_SIZE, GREY, BLUE
 
 class Cell:
     def __init__(self, row, col, tilecolour, masterytile, piece):
@@ -33,6 +33,9 @@ class Cell:
         self._draw_tile(win)
         if self.piece is not None:
             self.piece.draw(win)
+
+    def draw_valid_move_marker(self, win):
+        pygame.draw.circle(win, BLUE, (self.centrex, self.centrey), 15)
 
     def remove_piece(self):
         self.piece = None

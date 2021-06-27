@@ -1,4 +1,4 @@
-from .constants import BLACK, ROWS, RED, COLS, WHITE, DARKTILECOL, LIGHTTILECOL
+from .constants import ROWS, RED, COLS, WHITE, DARKTILECOL, LIGHTTILECOL
 from .piece import Cell, Piece
 from .players import Player, Players
 
@@ -84,6 +84,12 @@ class Board:
             for col in range(COLS):
                 cell = self.board[row][col]
                 cell.draw(win)
+
+    def draw_valid_moves(self, win, moves):
+        for move in moves:
+            row, col = move
+            cell = self.get_cell(row, col)
+            cell.draw_valid_move_marker(win)
 
     def remove(self, piece):
         row, col = piece.row, piece.col

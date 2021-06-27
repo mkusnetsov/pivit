@@ -1,6 +1,19 @@
 import pygame
-from .constants import RED, WHITE, ROWS, COLS, FIELDWIDTH, PANELWIDTH, PANELHEIGHT
+from .constants import RED, WHITE, GREY, ROWS, COLS, FIELDWIDTH, WINWIDTH, WINHEIGHT,PANELWIDTH, PANELHEIGHT, HORIZONTALOFFSET, VERTICALOFFSET, SQUARE_SIZE, BOARDWIDTH, BOARDHEIGHT
 from .board import Board
+
+class Menu:
+    def __init__(self, is_on):
+        self.is_on = is_on
+
+    def display_menu(self, win):
+        cornerx = WINWIDTH // 10
+        cornery = WINHEIGHT // 4
+        width = (WINWIDTH // 5) * 4
+        height = WINHEIGHT // 2
+        rect = pygame.Rect(cornerx, cornery, width, height)
+        pygame.draw.rect(win, GREY, rect)
+        
 
 class Game:
     def __init__(self, win):
@@ -8,12 +21,22 @@ class Game:
         self.win = win
     
     def update(self):
+        if self.menu.is_on:
+            self.update_menu_state()
+        else:
+            self.update_game_state()
+        pygame.display.update()
+
+    def update_menu_state(self):
+        self.menu.display_menu(self.win)
+
+    def update_game_state(self):
         self.board.draw(self.win)
         self.display_info(self.win)
         self.board.draw_valid_moves(self.win, self.valid_moves)
-        pygame.display.update()
 
     def _init(self):
+        self.menu = Menu(True)
         self.selected = None
         self.board = Board()
         self.players = self.board.players
@@ -30,6 +53,19 @@ class Game:
 
     def reset_valid_moves(self):
         self.valid_moves = []
+
+    def get_row_col_from_mouse(self, pos):
+        x, y = pos
+        row = (y - VERTICALOFFSET) // SQUARE_SIZE
+        col = (x - HORIZONTALOFFSET) // SQUARE_SIZE
+        return row, col
+
+    def process_mouse_click(self, pos):
+        if self.menu.is_on:
+            self.menu.is_on = False
+        else:
+            row, col = self.get_row_col_from_mouse(pos)
+            self.select(row, col)
 
     def select(self, row, col):
         if row < 0 or row >= ROWS or col < 0 or col >= COLS:

@@ -44,13 +44,14 @@ class Board:
     def move(self, piece, row, col, turn):
         source_cell = self.get_cell(piece.row, piece.col)
         target_cell = self.get_cell(row, col)
+
         target_cell.add_piece(piece)
         source_cell.remove_piece()
 
-        piece.move(row, col)
+        target_cell.piece.pivot()
 
         if self.is_mastery_tile(row, col):
-            piece.make_master(turn)
+            target_cell.piece.make_master(turn)
 
     def create_board(self):
         for row in range(ROWS):

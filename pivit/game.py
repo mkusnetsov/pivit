@@ -1,5 +1,5 @@
 import pygame
-from .constants import RED, WHITE, BLUE, SQUARE_SIZE, ROWS, COLS, WIDTH, PANELWIDTH, PANELHEIGHT
+from .constants import RED, WHITE, BLUE, SQUARE_SIZE, ROWS, COLS, FIELDWIDTH, PANELWIDTH, PANELHEIGHT, VERTICALOFFSET, HORIZONTALOFFSET
 from .board import Board
 
 class Game:
@@ -23,10 +23,7 @@ class Game:
 
     def winner(self):
         winner = self.board.winner()
-        if winner is None:
-            return "Draw"
-        else:
-            return winner
+        return winner
 
     def reset(self):
         self._init()
@@ -68,7 +65,7 @@ class Game:
     def draw_valid_moves(self, moves):
         for move in moves:
             row, col = move
-            pygame.draw.circle(self.win, BLUE, (col * SQUARE_SIZE + SQUARE_SIZE//2, row * SQUARE_SIZE + SQUARE_SIZE//2), 15)
+            pygame.draw.circle(self.win, BLUE, (HORIZONTALOFFSET + col * SQUARE_SIZE + SQUARE_SIZE//2, VERTICALOFFSET + row * SQUARE_SIZE + SQUARE_SIZE//2), 15)
 
     def change_turn(self):
         self.reset_valid_moves()
@@ -92,4 +89,4 @@ class Game:
         for i in range(len(inforenders)):
             panelsurf.blit(inforenders[i], dest = (10, 10 + (i * (fontsize + 15))))
 
-        win.blit(panelsurf, dest = (WIDTH, 0))
+        win.blit(panelsurf, dest = (FIELDWIDTH, 0))

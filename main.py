@@ -1,5 +1,5 @@
 import pygame
-from pivit.constants import WINWIDTH, WINHEIGHT, SQUARE_SIZE, RED
+from pivit.constants import WINWIDTH, WINHEIGHT, HORIZONTALOFFSET, VERTICALOFFSET, SQUARE_SIZE, RED
 from pivit.game import Game
 
 FPS = 60
@@ -10,8 +10,8 @@ pygame.display.set_caption('Pivit')
 
 def get_row_col_from_mouse(pos):
     x, y = pos
-    row = y // SQUARE_SIZE
-    col = x // SQUARE_SIZE
+    row = (y - VERTICALOFFSET) // SQUARE_SIZE
+    col = (x - HORIZONTALOFFSET) // SQUARE_SIZE
     return row, col
 
 def main():

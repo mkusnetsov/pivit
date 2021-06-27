@@ -1,21 +1,33 @@
 import pygame
-from .constants import RED, WHITE, SQUARE_SIZE, GREY
+from .constants import HORIZONTALOFFSET, VERTICALOFFSET, SQUARE_SIZE, GREY
 
 class Cell:
     def __init__(self, row, col, tilecolour, masterytile, piece):
         self.row = row
         self.col = col
+        self.cornerx = 0
+        self.cornery = 0
+        self.centrex = 0
+        self.centrey = 0
+        self.calc_corner_pos()
+        self.calc_centre_pos()
         self.tilecolour = tilecolour
         self.masterytile = masterytile
         self.piece = piece
+        if self.piece is not None:
+            self.piece.set_pos(self.row, self.col, self.centrex, self.centrey)
 
-    def _tile_rect(self):
-        tilex = self.col * SQUARE_SIZE
-        tiley = self.row * SQUARE_SIZE
-        return pygame.Rect(tilex, tiley, SQUARE_SIZE, SQUARE_SIZE)
+    def calc_corner_pos(self):
+        self.cornerx = HORIZONTALOFFSET + self.col * SQUARE_SIZE
+        self.cornery = VERTICALOFFSET + self.row * SQUARE_SIZE
+
+    def calc_centre_pos(self):
+        self.centrex = self.cornerx + SQUARE_SIZE // 2
+        self.centrey = self.cornery + SQUARE_SIZE // 2
 
     def _draw_tile(self, win):
-        pygame.draw.rect(win, self.tilecolour, self._tile_rect())
+        rect = pygame.Rect(self.cornerx, self.cornery, SQUARE_SIZE, SQUARE_SIZE)
+        pygame.draw.rect(win, self.tilecolour, rect)
 
     def draw(self, win):
         self._draw_tile(win)
@@ -27,6 +39,8 @@ class Cell:
     
     def add_piece(self, piece):
         self.piece = piece
+        if self.piece is not None:
+            self.piece.set_pos(self.row, self.col, self.centrex, self.centrey)
         
 
 class Piece:
@@ -44,12 +58,13 @@ class Piece:
         self.master = False
         self.x = 0
         self.y = 0
-        self.calc_pos()
         self.lateral = lateral
 
-    def calc_pos(self):
-        self.x = SQUARE_SIZE * self.col + SQUARE_SIZE // 2
-        self.y = SQUARE_SIZE * self.row + SQUARE_SIZE // 2
+    def set_pos(self, row, col, x, y):
+        self.row = row
+        self.col = col
+        self.x = x
+        self.y = y
 
     def pivot(self):
         self.lateral = not self.lateral
@@ -91,12 +106,6 @@ class Piece:
 
         pygame.draw.circle(win, bg_colour, (self.x, self.y), radius + self.OUTLINE)
         pygame.draw.polygon(win, fg_colour, diamondcoords)
-
-    def move(self, row, col):
-        self.row = row
-        self.col = col
-        self.calc_pos()
-        self.pivot()
 
     def same_side(self, piece):
         if piece is None:

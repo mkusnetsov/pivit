@@ -51,4 +51,3 @@ def set_difficulty(value, difficulty):
         raise ValueError
 
 starting_menu(WIN)
-# main()

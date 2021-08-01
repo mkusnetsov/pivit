@@ -1,39 +1,58 @@
-from .constants import ROWS, RED, COLS, WHITE, DARKTILECOL, LIGHTTILECOL
+from .constants import RED, WHITE, DARKTILECOL, LIGHTTILECOL, STARTINGCOORDS
 from .piece import Cell, Piece
 from .players import Player, Players
 
 class Board:
     def __init__(self, board_size, num_players):
-        print(f"Board size: {board_size}")
         self.board = []
         self.players = Players([Player("Red", RED), Player("White", WHITE)])
-        self.red_minions = self.white_minions = 12
+        self.initialise_counts(board_size, num_players)
+        self.create_board(board_size, num_players)
+
+    def initialise_counts(self, board_size, num_players):
+        self.rows = board_size
+        self.cols = board_size
+
+        minions_per_player = (board_size - 2) * 4 // num_players
+
+        self.red_minions = self.white_minions = minions_per_player
         self.red_masters = self.white_masters = 0
-        self.create_board()
+
+    def is_edge_row(self, row):
+        return row == self.rows - 1 or row == 0
+
+    def is_edge_col(self, col):
+        return col == self.cols - 1 or col == 0
+
+    def tile_colour(self, row, col):
+        if (row - col) % 2 == 0:
+            return DARKTILECOL
+        else:
+            return LIGHTTILECOL
 
     def is_mastery_tile(self, row, col):
-        return (row == ROWS - 1 or row == 0) and (col == ROWS - 1 or col == 0)
+        return self.is_edge_row(row) and self.is_edge_col(col)
 
     def starts_lateral(self, row, col):
-        return col == 0 or col == COLS-1
+        return self.is_edge_col(col)
 
-    def is_starting_white(self, row, col):
-        if col == 0 or col == COLS-1:
-            if row in [1, 3, 4, 6]:
-                return True
-        elif row == 0 or row == ROWS-1:
-            if col in [2, 5]:
-                return True
-        return False
+    def who_is_player(self, row, col, board_size, num_players):
+        num_players_for_board_size = STARTINGCOORDS[board_size]
+        players_for_board_size = num_players_for_board_size[num_players]
+        
+        for player in range(num_players):
+            player_rows, player_cols = players_for_board_size[player]
 
-    def is_starting_red(self, row, col):
-        if col == 0 or col == COLS-1:
-            if row in [2, 5]:
-                return True
-        elif row == 0 or row == ROWS-1:
-            if col in [1, 3, 4, 6]:
-                return True
-        return False
+            starting_col = self.is_edge_col(col) and row in player_rows
+            starting_row = self.is_edge_row(row) and col in player_cols
+
+            if starting_col or starting_row:
+                return player
+            else:
+                pass
+
+        return None
+
 
     def get_cell(self, row, col):
         return self.board[row][col]
@@ -54,35 +73,30 @@ class Board:
         if self.is_mastery_tile(row, col):
             target_cell.piece.make_master(turn)
 
-    def create_board(self):
-        for row in range(ROWS):
+    def create_board(self, board_size, num_players):
+        for row in range(self.rows):
             self.board.append([])
-            for col in range(COLS):
-                if (row - col) % 2 == 0:
-                    tilecolour = DARKTILECOL
-                else:
-                    tilecolour = LIGHTTILECOL
+            for col in range(self.cols):
 
+                tilecolour = self.tile_colour(row, col)
                 masterytile = self.is_mastery_tile(row, col)
+                lateral = self.starts_lateral(row, col)
+                player_index = self.who_is_player(row, col, board_size, num_players)
 
-                if self.is_starting_white(row, col):
-                    if self.starts_lateral(row, col):
-                        piece = Piece(row, col, self.players["White"], True)
-                    else:
-                        piece = Piece(row, col, self.players["White"], False)
-                elif self.is_starting_red(row, col):
-                    if self.starts_lateral(row, col):
-                        piece = Piece(row, col, self.players["Red"], True)
-                    else:
-                        piece = Piece(row, col, self.players["Red"], False)
-                else:
+                if player_index is None:
                     piece = None
+                else:
+                    player_name = self.players.names[player_index]
+                    player = self.players[player_name]
+                    piece = Piece(row, col, player, lateral)
 
-                self.board[row].append(Cell(row, col, tilecolour, masterytile, piece))
+                cell = Cell(row, col, tilecolour, masterytile, piece)
+
+                self.board[row].append(cell)
         
     def draw(self, win):
-        for row in range(ROWS):
-            for col in range(COLS):
+        for row in range(self.rows):
+            for col in range(self.cols):
                 cell = self.board[row][col]
                 cell.draw(win)
 
@@ -123,12 +137,12 @@ class Board:
 
         if piece.lateral:
             new_col = piece.col + shift
-            if new_col >= COLS or new_col < 0:
+            if new_col >= self.cols or new_col < 0:
                 return None
             return piece.row, new_col
         else:
             new_row = piece.row + shift
-            if new_row >= ROWS or new_row < 0:
+            if new_row >= self.rows or new_row < 0:
                 return None
             return new_row, piece.col
 

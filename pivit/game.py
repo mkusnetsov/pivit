@@ -1,5 +1,5 @@
 import pygame
-from .constants import RED, WHITE, GREY, ROWS, COLS, FIELDWIDTH, WINWIDTH, WINHEIGHT,PANELWIDTH, PANELHEIGHT, HORIZONTALOFFSET, VERTICALOFFSET, SQUARE_SIZE, BOARDWIDTH, BOARDHEIGHT
+from .constants import GameConfig, RED, WHITE, GREY, ROWS, COLS, FIELDWIDTH, WINWIDTH, WINHEIGHT,PANELWIDTH, PANELHEIGHT, HORIZONTALOFFSET, VERTICALOFFSET, SQUARE_SIZE, BOARDWIDTH, BOARDHEIGHT
 from .board import Board
 
 class Menu:
@@ -13,11 +13,11 @@ class Menu:
         height = WINHEIGHT // 2
         rect = pygame.Rect(cornerx, cornery, width, height)
         pygame.draw.rect(win, GREY, rect)
-        
+
 
 class Game:
-    def __init__(self, win):
-        self._init()
+    def __init__(self, win, config):
+        self._init(config)
         self.win = win
     
     def update(self):
@@ -35,10 +35,10 @@ class Game:
         self.display_info(self.win)
         self.board.draw_valid_moves(self.win, self.valid_moves)
 
-    def _init(self):
-        self.menu = Menu(True)
+    def _init(self, config):
+        self.menu = Menu(False)
         self.selected = None
-        self.board = Board()
+        self.board = Board(config.board_size, config.num_players)
         self.players = self.board.players
         self.current_player = self.players.starting()
         self.turn = 1

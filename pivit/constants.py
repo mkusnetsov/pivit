@@ -23,3 +23,14 @@ GREY = (128,128,128)
 
 DARKTILECOL = RED
 LIGHTTILECOL = WHITE
+
+class GameConfig:
+    def __init__(self):
+        self.num_players = 2
+        self.board_size = 8
+
+    def set_num_players(self, num_players):
+        self.num_players = num_players
+
+    def set_board_size(self, board_size):
+        self.board_size = board_size

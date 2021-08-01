@@ -3,7 +3,8 @@ from .piece import Cell, Piece
 from .players import Player, Players
 
 class Board:
-    def __init__(self):
+    def __init__(self, board_size, num_players):
+        print(f"Board size: {board_size}")
         self.board = []
         self.players = Players([Player("Red", RED), Player("White", WHITE)])
         self.red_minions = self.white_minions = 12

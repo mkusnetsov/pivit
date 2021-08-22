@@ -5,40 +5,61 @@ from pivit.game import Game
 
 FPS = 60
 CONFIG = GameConfig()
+GAME = None
 
 pygame.init()
 WIN = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
 pygame.display.set_caption('Pivit')
 
-def starting_menu(win):
+# def starting_menu(win):
+#     menu = pygame_menu.Menu('Welcome', 400, 300, theme=pygame_menu.themes.THEME_BLUE)
+#     menu.add.text_input('Name :', default='John Doe')
+#     menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
+#     menu.add.button('Play', main)
+#     menu.add.button('Quit', pygame_menu.events.EXIT)    
+#     menu.mainloop(win)
+
+def make_starting_menu():
     menu = pygame_menu.Menu('Welcome', 400, 300, theme=pygame_menu.themes.THEME_BLUE)
     menu.add.text_input('Name :', default='John Doe')
     menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
-    menu.add.button('Play', main)
+    menu.add.button('Play', start_game, menu)
     menu.add.button('Quit', pygame_menu.events.EXIT)    
-    menu.mainloop(win)
+    return menu
+
+def start_game(menu):
+    global GAME
+    GAME = Game(WIN, CONFIG)
+    menu.disable()
 
 def main():
     run = True
     clock = pygame.time.Clock()
-    game = Game(WIN, CONFIG)
+    menu = make_starting_menu()
 
     while run:
         clock.tick(FPS)
 
-        if game.winner() != None:
-            print(game.winner())
-            run = False
+        events = pygame.event.get()
 
-        for event in pygame.event.get():
+        for event in events:
             if event.type == pygame.QUIT:
                 run = False
-            
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                game.process_mouse_click(pos)
 
-        game.update()
+            if menu.is_enabled():
+                menu.update(events)
+                menu.draw(WIN)
+                pygame.display.update()
+            
+            elif GAME is not None:
+                if GAME.winner() != None:
+                    print(GAME.winner())
+                    run = False
+                
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = pygame.mouse.get_pos()
+                    GAME.process_mouse_click(pos)
+                    GAME.update()
     
     pygame.quit()
 
@@ -50,4 +71,5 @@ def set_difficulty(value, difficulty):
     else:
         raise ValueError
 
-starting_menu(WIN)
+main()
+# starting_menu(WIN)

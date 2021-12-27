@@ -1,4 +1,4 @@
-from .constants import RED, WHITE, DARKTILECOL, LIGHTTILECOL, STARTINGCOORDS
+from .constants import RED, WHITE, DARKTILECOL, LIGHTTILECOL, STARTINGCOORDS, SQUARE_SIZE, FIELDWIDTH, FIELDHEIGHT
 from .piece import Cell, Piece
 from .players import Player, Players
 
@@ -7,7 +7,13 @@ class Board:
         self.board = []
         self.players = Players([Player("Red", RED), Player("White", WHITE)])
         self.initialise_counts(board_size, num_players)
+        self.determine_offsets(board_size)
         self.create_board(board_size, num_players)
+
+    def determine_offsets(self, board_size):
+        boardwidth = boardheight = SQUARE_SIZE * board_size
+        self.horizontal_offset = (FIELDWIDTH - boardwidth)//2
+        self.vertical_offset = (FIELDHEIGHT - boardheight)//2
 
     def initialise_counts(self, board_size, num_players):
         self.rows = board_size
@@ -53,7 +59,6 @@ class Board:
 
         return None
 
-
     def get_cell(self, row, col):
         return self.board[row][col]
 
@@ -90,7 +95,7 @@ class Board:
                     player = self.players[player_name]
                     piece = Piece(row, col, player, lateral)
 
-                cell = Cell(row, col, tilecolour, masterytile, piece)
+                cell = Cell(row, col, tilecolour, masterytile, piece, self)
 
                 self.board[row].append(cell)
         

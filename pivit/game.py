@@ -1,5 +1,5 @@
 import pygame
-from .constants import GameConfig, RED, WHITE, GREY, ROWS, COLS, FIELDWIDTH, WINWIDTH, WINHEIGHT,PANELWIDTH, PANELHEIGHT, HORIZONTALOFFSET, VERTICALOFFSET, SQUARE_SIZE, BOARDWIDTH, BOARDHEIGHT
+from .constants import RED, WHITE, FIELDWIDTH, PANELWIDTH, PANELHEIGHT, SQUARE_SIZE
 from .board import Board
 
 class Game:
@@ -15,6 +15,7 @@ class Game:
 
     def _init(self, config):
         self.selected = None
+        self.board_size = config.board_size
         self.board = Board(config.board_size, config.num_players)
         self.players = self.board.players
         self.current_player = self.players.starting()
@@ -32,9 +33,11 @@ class Game:
         self.valid_moves = []
 
     def get_row_col_from_mouse(self, pos):
+        voffset = self.board.vertical_offset
+        hoffset = self.board.horizontal_offset
         x, y = pos
-        row = (y - VERTICALOFFSET) // SQUARE_SIZE
-        col = (x - HORIZONTALOFFSET) // SQUARE_SIZE
+        row = (y - voffset) // SQUARE_SIZE
+        col = (x - hoffset) // SQUARE_SIZE
         return row, col
 
     def process_mouse_click(self, pos):
@@ -42,7 +45,7 @@ class Game:
         self.select(row, col)
 
     def select(self, row, col):
-        if row < 0 or row >= ROWS or col < 0 or col >= COLS:
+        if row < 0 or row >= self.board_size or col < 0 or col >= self.board_size:
             return False
 
         if self.selected:

@@ -11,14 +11,6 @@ pygame.init()
 WIN = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
 pygame.display.set_caption('Pivit')
 
-# def starting_menu(win):
-#     menu = pygame_menu.Menu('Welcome', 400, 300, theme=pygame_menu.themes.THEME_BLUE)
-#     menu.add.text_input('Name :', default='John Doe')
-#     menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
-#     menu.add.button('Play', main)
-#     menu.add.button('Quit', pygame_menu.events.EXIT)    
-#     menu.mainloop(win)
-
 def make_starting_menu():
     menu = pygame_menu.Menu('Welcome', 400, 300, theme=pygame_menu.themes.THEME_BLUE)
     menu.add.text_input('Name :', default='John Doe')
@@ -77,4 +69,3 @@ def set_difficulty(value, difficulty):
         raise ValueError
 
 main()
-# starting_menu(WIN)

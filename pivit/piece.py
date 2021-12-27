@@ -1,14 +1,16 @@
 import pygame
-from .constants import HORIZONTALOFFSET, VERTICALOFFSET, SQUARE_SIZE, GREY, BLUE
+from .constants import SQUARE_SIZE, GREY, BLUE
 
 class Cell:
-    def __init__(self, row, col, tilecolour, masterytile, piece):
+    def __init__(self, row, col, tilecolour, masterytile, piece, board):
         self.row = row
         self.col = col
         self.cornerx = 0
         self.cornery = 0
         self.centrex = 0
         self.centrey = 0
+        self.vertical_offset = board.vertical_offset
+        self.horizontal_offset = board.horizontal_offset
         self.calc_corner_pos()
         self.calc_centre_pos()
         self.tilecolour = tilecolour
@@ -18,8 +20,8 @@ class Cell:
             self.piece.set_pos(self.row, self.col, self.centrex, self.centrey)
 
     def calc_corner_pos(self):
-        self.cornerx = HORIZONTALOFFSET + self.col * SQUARE_SIZE
-        self.cornery = VERTICALOFFSET + self.row * SQUARE_SIZE
+        self.cornerx = self.horizontal_offset + self.col * SQUARE_SIZE
+        self.cornery = self.vertical_offset + self.row * SQUARE_SIZE
 
     def calc_centre_pos(self):
         self.centrex = self.cornerx + SQUARE_SIZE // 2

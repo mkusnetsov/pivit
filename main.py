@@ -29,8 +29,10 @@ def make_starting_menu():
 
 def start_game(menu):
     global GAME
-    GAME = Game(WIN, CONFIG)
     menu.disable()
+    WIN.fill((0,0,0))
+    GAME = Game(WIN, CONFIG)
+    GAME.update()
 
 def main():
     run = True
@@ -48,10 +50,13 @@ def main():
 
             if menu.is_enabled():
                 menu.update(events)
-                menu.draw(WIN)
-                pygame.display.update()
-            
-            elif GAME is not None:
+                if menu.is_enabled(): # The menu is still active, i.e. the game has not started
+                    menu.draw(WIN)
+                    pygame.display.update()
+                continue
+        
+            # menu is not enabled
+            if GAME is not None:
                 if GAME.winner() != None:
                     print(GAME.winner())
                     run = False

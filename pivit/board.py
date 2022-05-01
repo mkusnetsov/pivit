@@ -4,25 +4,24 @@ from .players import Player, Players
 
 class Board:
     def __init__(self, board_size, num_players):
-        self.board = []
-        self.players = Players([Player("Red", RED), Player("White", WHITE)])
-        self.initialise_counts(board_size, num_players)
+        self.initialise_board(board_size)
+        self.initialise_players(board_size, num_players)
         self.determine_offsets(board_size)
         self.create_board(board_size, num_players)
+
+    def initialise_board(self, board_size):
+        self.board = []
+        self.rows = board_size
+        self.cols = board_size
+
+    def initialise_players(self, board_size, num_players):
+        minions = (board_size - 2) * 4 // num_players
+        self.players = Players([Player("Red", RED, minions), Player("White", WHITE, minions)])
 
     def determine_offsets(self, board_size):
         boardwidth = boardheight = SQUARE_SIZE * board_size
         self.horizontal_offset = (FIELDWIDTH - boardwidth)//2
         self.vertical_offset = (FIELDHEIGHT - boardheight)//2
-
-    def initialise_counts(self, board_size, num_players):
-        self.rows = board_size
-        self.cols = board_size
-
-        minions_per_player = (board_size - 2) * 4 // num_players
-
-        self.red_minions = self.white_minions = minions_per_player
-        self.red_masters = self.white_masters = 0
 
     def is_edge_row(self, row):
         return row == self.rows - 1 or row == 0
@@ -99,17 +98,17 @@ class Board:
 
                 self.board[row].append(cell)
         
-    def draw(self, win):
+    def draw(self, window):
         for row in range(self.rows):
             for col in range(self.cols):
                 cell = self.board[row][col]
-                cell.draw(win)
+                cell.draw(window)
 
-    def draw_valid_moves(self, win, moves):
+    def draw_valid_moves(self, window, moves):
         for move in moves:
             row, col = move
             cell = self.get_cell(row, col)
-            cell.draw_valid_move_marker(win)
+            cell.draw_valid_move_marker(window)
 
     def remove(self, piece):
         row, col = piece.row, piece.col
@@ -119,22 +118,6 @@ class Board:
         if piece is not None:
             piece.player.lose_piece(master=piece.master)
             self.players.update_active_number()
-    
-    def game_is_over(self):
-        if self.players.active_number == 1:
-            print("Only one player left")
-            return True
-        elif self.players.no_minions_left():
-            print("No minions left")
-            return True
-        else:
-            return False
-
-    def winner(self):
-        if self.game_is_over():
-            return self.players.winner_if_game_over()
-        
-        return None 
 
     def location_on_movement_axis(self, piece, shift_size, positive):
         shift = shift_size if positive else (-1 * shift_size)

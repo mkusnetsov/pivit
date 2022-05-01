@@ -8,7 +8,7 @@ CONFIG = GameConfig()
 GAME = None
 
 pygame.init()
-WIN = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
+WINDOW = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
 pygame.display.set_caption('Pivit')
 
 def make_starting_menu():
@@ -22,8 +22,8 @@ def make_starting_menu():
 def start_game(menu):
     global GAME
     menu.disable()
-    WIN.fill((0,0,0))
-    GAME = Game(WIN, CONFIG)
+    WINDOW.fill((0,0,0))
+    GAME = Game(WINDOW, CONFIG)
     GAME.update()
 
 def main():
@@ -43,14 +43,14 @@ def main():
             if menu.is_enabled():
                 menu.update(events)
                 if menu.is_enabled(): # The menu is still active, i.e. the game has not started
-                    menu.draw(WIN)
+                    menu.draw(WINDOW)
                     pygame.display.update()
                 continue
         
             # menu is not enabled
             if GAME is not None:
-                if GAME.winner() != None:
-                    print(GAME.winner())
+                if GAME.game_is_over():
+                    print(GAME.game_status_message())
                     run = False
                 
                 if event.type == pygame.MOUSEBUTTONDOWN:

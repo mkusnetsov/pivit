@@ -1,14 +1,11 @@
 from itertools import cycle
 
 class Player:
-    STARTING_MINIONS = 12
-    STARTING_MASTERS = 0
-
-    def __init__(self, name, colour):
+    def __init__(self, name, colour, minions):
         self.name = name
         self.colour = colour
-        self.minions = self.STARTING_MINIONS
-        self.masters = self.STARTING_MASTERS
+        self.minions = minions
+        self.masters = 0
         self.defeated = False
         self.first_master = None
 
@@ -83,6 +80,14 @@ class Players:
         active_players = self.get_active_players()
         minion_counts = [player.minions for player in active_players]
         return sum(minion_counts) == 0
+
+    def master_tie(self):
+        active_players = self.get_active_players()
+        master_counts = [player.masters for player in active_players]
+        if len(master_counts) < 2:
+            return False
+        master_counts = sorted(master_counts, reverse=True)
+        return master_counts[0]==master_counts[1]
 
     def winner_if_game_over(self):
         active_players = self.get_active_players()

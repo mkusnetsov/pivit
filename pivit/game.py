@@ -1,17 +1,25 @@
 import pygame
+from enum import Enum
 from .constants import RED, WHITE, FIELDWIDTH, PANELWIDTH, PANELHEIGHT, SQUARE_SIZE
 from .board import Board
 
+class GameStatus(Enum):
+    LIVE = 0
+    NOMINIONS = 1
+    NOMINIONSTIE = 2
+    ONEPLAYER = 3
+
 class Game:
-    def __init__(self, win, config):
+    def __init__(self, window, config):
+        self.window = window
         self._init(config)
-        self.win = win
     
     def update(self):
-        self.board.draw(self.win)
-        self.display_info(self.win)
-        self.board.draw_valid_moves(self.win, self.valid_moves)
+        self.board.draw(self.window)
+        self.display_info(self.window)
+        self.board.draw_valid_moves(self.window, self.valid_moves)
         pygame.display.update()
+        self.update_game_status()
 
     def _init(self, config):
         self.selected = None
@@ -21,10 +29,36 @@ class Game:
         self.current_player = self.players.starting()
         self.turn = 1
         self.valid_moves = []
+        self.status = GameStatus.LIVE
 
-    def winner(self):
-        winner = self.board.winner()
-        return winner
+    def game_is_over(self):
+        return self.status != GameStatus.LIVE
+
+    def update_game_status(self):
+        if self.players.active_number == 1:
+            self.status = GameStatus.ONEPLAYER
+        elif self.players.no_minions_left():
+            if self.players.master_tie():
+                self.status = GameStatus.NOMINIONSTIE
+            else:
+                self.status = GameStatus.NOMINIONS
+        else:
+            self.status = GameStatus.LIVE
+
+    def game_status_message(self):
+        if self.status == GameStatus.LIVE:
+            return "The game is ongoing. There is no winner yet."
+
+        winner = self.players.winner_if_game_over()
+
+        if self.status == GameStatus.ONEPLAYER:
+            return f"{winner} wins as the only remaining player"
+        elif self.status == GameStatus.NOMINIONS:
+            return f"{winner} wins as they have the largest number of masters"
+        elif self.status == GameStatus.NOMINIONSTIE:
+            return f"{winner} wins as they tie for the largest number of masters and earned their first master first"
+        else:
+            raise ValueError
 
     def reset(self):
         self._init()
@@ -80,7 +114,7 @@ class Game:
         self.current_player = self.players.next()
         self.turn += 1
 
-    def display_info(self, win):
+    def display_info(self, window):
         panelsurf = pygame.Surface((PANELWIDTH, PANELHEIGHT))
         panelsurf.fill(color=RED)
 
@@ -97,4 +131,4 @@ class Game:
         for i in range(len(inforenders)):
             panelsurf.blit(inforenders[i], dest = (10, 10 + (i * (fontsize + 15))))
 
-        win.blit(panelsurf, dest = (FIELDWIDTH, 0))
+        window.blit(panelsurf, dest = (FIELDWIDTH, 0))

@@ -117,16 +117,15 @@ class Board:
         cell.remove_piece()
 
         if piece is not None:
-            if piece.master:
-                piece.player.lose_piece(master=True)
-            else:
-                piece.player.lose_piece(master=False)
+            piece.player.lose_piece(master=piece.master)
             self.players.update_active_number()
     
     def game_is_over(self):
         if self.players.active_number == 1:
+            print("Only one player left")
             return True
         elif self.players.no_minions_left():
+            print("No minions left")
             return True
         else:
             return False

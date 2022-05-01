@@ -36,10 +36,14 @@ class Player:
         if self.defeated:
             return True
 
+        if other.first_master is None:
+            return False
+
+        if self.first_master is None:
+            return True
+
         if self.masters != other.masters:
             return self.masters < other.masters
-        elif self.masters == 0:
-            return False
         else:
             return self.first_master > other.first_master
 

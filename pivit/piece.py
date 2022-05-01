@@ -75,8 +75,9 @@ class Piece:
         self.lateral = not self.lateral
 
     def make_master(self, turn):
-        self.master = True
-        self.player.promote_piece(turn)
+        if not self.master:
+            self.master = True
+            self.player.promote_piece(turn)
 
     def diamond_coords(self, radius):
         halfmajorlen = radius * self.MAJORFACTOR

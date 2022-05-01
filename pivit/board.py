@@ -3,10 +3,11 @@ from .piece import Cell, Piece
 from .players import Player, Players
 
 class Board:
-    def __init__(self, board_size, num_players):
+    def __init__(self, board_size, num_players, hoffset, voffset):
         self.initialise_board(board_size)
         self.initialise_players(board_size, num_players)
-        self.determine_offsets(board_size)
+        self.horizontal_offset = hoffset
+        self.vertical_offset = voffset
         self.create_board(board_size, num_players)
 
     def initialise_board(self, board_size):
@@ -17,11 +18,6 @@ class Board:
     def initialise_players(self, board_size, num_players):
         minions = (board_size - 2) * 4 // num_players
         self.players = Players([Player("Red", RED, minions), Player("White", WHITE, minions)])
-
-    def determine_offsets(self, board_size):
-        boardwidth = boardheight = SQUARE_SIZE * board_size
-        self.horizontal_offset = (FIELDWIDTH - boardwidth)//2
-        self.vertical_offset = (FIELDHEIGHT - boardheight)//2
 
     def is_edge_row(self, row):
         return row == self.rows - 1 or row == 0
@@ -94,7 +90,7 @@ class Board:
                     player = self.players[player_name]
                     piece = Piece(row, col, player, lateral)
 
-                cell = Cell(row, col, tilecolour, masterytile, piece, self)
+                cell = Cell(row, col, tilecolour, masterytile, piece, self.horizontal_offset, self.vertical_offset)
 
                 self.board[row].append(cell)
         

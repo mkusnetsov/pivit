@@ -1,7 +1,7 @@
 import pygame
 import pygame_menu
 from pivit.constants import WINWIDTH, WINHEIGHT, GameConfig
-from pivit.game import Game
+from pivit.game import GameManager
 
 FPS = 60
 CONFIG = GameConfig()
@@ -23,7 +23,7 @@ def start_game(menu):
     global GAME
     menu.disable()
     WINDOW.fill((0,0,0))
-    GAME = Game(WINDOW, CONFIG)
+    GAME = GameManager(WINDOW, CONFIG)
     GAME.update()
 
 def main():

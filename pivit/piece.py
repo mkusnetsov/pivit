@@ -2,15 +2,15 @@ import pygame
 from .constants import SQUARE_SIZE, GREY, BLUE
 
 class Cell:
-    def __init__(self, row, col, tilecolour, masterytile, piece, board):
+    def __init__(self, row, col, tilecolour, masterytile, piece, hoffset, voffset):
         self.row = row
         self.col = col
         self.cornerx = 0
         self.cornery = 0
         self.centrex = 0
         self.centrey = 0
-        self.vertical_offset = board.vertical_offset
-        self.horizontal_offset = board.horizontal_offset
+        self.vertical_offset = hoffset
+        self.horizontal_offset = voffset
         self.calc_corner_pos()
         self.calc_centre_pos()
         self.tilecolour = tilecolour

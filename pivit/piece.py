@@ -1,4 +1,3 @@
-
 class Cell:
     def __init__(self, row, col, tilecolour, masterytile, piece):
         self.row = row

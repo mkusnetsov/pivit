@@ -1,21 +1,14 @@
 import pygame
-from enum import Enum
-from .constants import RED, WHITE, FIELDWIDTH, FIELDHEIGHT, PANELWIDTH, PANELHEIGHT, SQUARE_SIZE
+from .constants import RED, WHITE, FIELDWIDTH, FIELDHEIGHT, PANELWIDTH, PANELHEIGHT, SQUARE_SIZE, GameStatus
 from .board import Board
 from .render import GameRenderer
-
-class GameStatus(Enum):
-    LIVE = 0
-    NOMINIONS = 1
-    NOMINIONSTIE = 2
-    ONEPLAYER = 3
 
 class GameManager:
     def __init__(self, window, config):
         self.config = config
         self.determine_offsets(config.board_size)
         self.renderer = GameRenderer(window, self.horizontal_offset, self.vertical_offset)
-        self.game = Game(config, self.horizontal_offset, self.vertical_offset)
+        self.game = Game(config)
 
     def determine_offsets(self, board_size):
         boardwidth = boardheight = SQUARE_SIZE * board_size
@@ -84,8 +77,8 @@ class GameManager:
             raise ValueError
 
 class Game:
-    def __init__(self, config, hoffset, voffset):
-        self.board = Board(config.board_size, config.num_players, hoffset, voffset)
+    def __init__(self, config):
+        self.board = Board(config.board_size, config.num_players)
         self.players = self.board.players
         self.current_player = self.players.starting()
         self.turn = 1

@@ -1,13 +1,11 @@
-from .constants import RED, WHITE, DARKTILECOL, LIGHTTILECOL, STARTINGCOORDS
+from .constants import STARTINGCOORDS, Colour
 from .piece import Cell, Piece
 from .players import Player, Players
 
 class Board:
-    def __init__(self, board_size, num_players, hoffset, voffset):
+    def __init__(self, board_size, num_players):
         self.initialise_board(board_size)
         self.initialise_players(board_size, num_players)
-        self.horizontal_offset = hoffset
-        self.vertical_offset = voffset
         self.create_board(board_size, num_players)
 
     def initialise_board(self, board_size):
@@ -17,7 +15,7 @@ class Board:
 
     def initialise_players(self, board_size, num_players):
         minions = (board_size - 2) * 4 // num_players
-        self.players = Players([Player("Red", RED, minions), Player("White", WHITE, minions)])
+        self.players = Players([Player("Red", Colour.PLAYERRED, minions), Player("White", Colour.PLAYERWHITE, minions)])
 
     def is_edge_row(self, row):
         return row == self.rows - 1 or row == 0
@@ -27,9 +25,9 @@ class Board:
 
     def tile_colour(self, row, col):
         if (row - col) % 2 == 0:
-            return DARKTILECOL
+            return Colour.TILEDARK
         else:
-            return LIGHTTILECOL
+            return Colour.TILELIGHT
 
     def is_mastery_tile(self, row, col):
         return self.is_edge_row(row) and self.is_edge_col(col)

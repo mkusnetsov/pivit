@@ -1,5 +1,5 @@
 import pygame
-from .constants import BLUE, GREY, SQUARE_SIZE
+from .constants import RED, WHITE, BLUE, GREY, SQUARE_SIZE, Colour
 
 class GameRenderer:
     PADDING = 15
@@ -7,6 +7,12 @@ class GameRenderer:
     MAJORFACTOR = 0.9 # Length of the major axis of the diamond relative to the circle diameter
     MINORFACTOR = 0.5 # Length of the minor axis of the diamond relative to the major axis
     NEUTRALCOLOUR = GREY
+    DARKTILECOL = RED
+    LIGHTTILECOL = WHITE
+    REDPLAYERCOL = RED
+    WHITEPLATERCOL = WHITE
+    TILECOLS = {Colour.TILEDARK: DARKTILECOL, Colour.TILELIGHT: LIGHTTILECOL}
+    PLAYERCOLS = {Colour.PLAYERRED: REDPLAYERCOL, Colour.PLAYERWHITE: WHITEPLATERCOL}
 
     def __init__(self, window, horizontal_offset, vertical_offset):
         self.window = window
@@ -46,11 +52,11 @@ class GameRenderer:
     
     def draw_piece(self, piece, x, y):
         if piece.master:
-            bg_colour = piece.colour
+            bg_colour = self.PLAYERCOLS[piece.colour]
             fg_colour = self.NEUTRALCOLOUR
         else:
             bg_colour = self.NEUTRALCOLOUR
-            fg_colour = piece.colour
+            fg_colour = self.PLAYERCOLS[piece.colour]
 
         radius = SQUARE_SIZE//2 - self.PADDING
         diamondcoords = self.diamond_coords(radius, x, y, piece.lateral)
@@ -61,7 +67,7 @@ class GameRenderer:
     def draw_tile(self, row, col, tilecolour):
         cornerx, cornery =  self.calc_corner_pos(row, col)
         rect = pygame.Rect(cornerx, cornery, SQUARE_SIZE, SQUARE_SIZE)
-        pygame.draw.rect(self.window, tilecolour, rect)
+        pygame.draw.rect(self.window, self.TILECOLS[tilecolour], rect)
 
     def draw_cell(self, cell):
         self.draw_tile(cell.row, cell.col, cell.tilecolour)

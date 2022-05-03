@@ -1,4 +1,4 @@
-
+from enum import Enum
 
 FIELDWIDTH, FIELDHEIGHT = 800, 800
 
@@ -20,9 +20,6 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 GREY = (128,128,128)
-
-DARKTILECOL = RED
-LIGHTTILECOL = WHITE
 
 STARTINGCOORDS = {
     6: {
@@ -52,6 +49,18 @@ STARTINGCOORDS = {
         }
     }
 }
+
+class GameStatus(Enum):
+    LIVE = 0
+    NOMINIONS = 1
+    NOMINIONSTIE = 2
+    ONEPLAYER = 3
+
+class Colour(Enum):
+    TILELIGHT = 0
+    TILEDARK = 1
+    PLAYERRED = 2
+    PLAYERWHITE = 3
 
 class GameConfig:
     def __init__(self):

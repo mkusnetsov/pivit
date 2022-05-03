@@ -49,14 +49,15 @@ def main():
         
             # menu is not enabled
             if GAME is not None:
-                if GAME.game_is_over():
-                    print(GAME.game_status_message())
-                    run = False
-                
+
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     GAME.process_mouse_click(pos)
                     GAME.update()
+    
+                if GAME.game_is_over():
+                    print(GAME.game_status_message())
+                    run = False
     
     pygame.quit()
 

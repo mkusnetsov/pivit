@@ -27,17 +27,17 @@ class Cell:
         self.centrex = self.cornerx + SQUARE_SIZE // 2
         self.centrey = self.cornery + SQUARE_SIZE // 2
 
-    def _draw_tile(self, window):
+    def _draw_tile(self, win):
         rect = pygame.Rect(self.cornerx, self.cornery, SQUARE_SIZE, SQUARE_SIZE)
-        pygame.draw.rect(window, self.tilecolour, rect)
+        pygame.draw.rect(win, self.tilecolour, rect)
 
-    def draw(self, window):
-        self._draw_tile(window)
+    def draw(self, win):
+        self._draw_tile(win)
         if self.piece is not None:
-            self.piece.draw(window)
+            self.piece.draw(win)
 
-    def draw_valid_move_marker(self, window):
-        pygame.draw.circle(window, BLUE, (self.centrex, self.centrey), 15)
+    def draw_valid_move_marker(self, win):
+        pygame.draw.circle(win, BLUE, (self.centrex, self.centrey), 15)
 
     def remove_piece(self):
         self.piece = None
@@ -75,7 +75,6 @@ class Piece:
         self.lateral = not self.lateral
 
     def make_master(self, turn):
-        if not self.master:
             self.master = True
             self.player.promote_piece(turn)
 
@@ -99,7 +98,7 @@ class Piece:
 
         return diamondcoords
     
-    def draw(self, window):
+    def draw(self, win):
         if self.master:
             bg_colour = self.colour
             fg_colour = self.NEUTRALCOLOUR
@@ -110,8 +109,8 @@ class Piece:
         radius = SQUARE_SIZE//2 - self.PADDING
         diamondcoords = self.diamond_coords(radius)
 
-        pygame.draw.circle(window, bg_colour, (self.x, self.y), radius + self.OUTLINE)
-        pygame.draw.polygon(window, fg_colour, diamondcoords)
+        pygame.draw.circle(win, bg_colour, (self.x, self.y), radius + self.OUTLINE)
+        pygame.draw.polygon(win, fg_colour, diamondcoords)
 
     def same_side(self, piece):
         if piece is None:

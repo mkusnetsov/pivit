@@ -61,18 +61,6 @@ class Board:
         cell = self.get_cell(row, col)
         return cell.piece
 
-    def move(self, piece, row, col, turn):
-        source_cell = self.get_cell(piece.row, piece.col)
-        target_cell = self.get_cell(row, col)
-
-        target_cell.add_piece(piece)
-        source_cell.remove_piece()
-
-        target_cell.piece.pivot()
-
-        if self.is_mastery_tile(row, col):
-            target_cell.piece.make_master(turn)
-
     def create_board(self, board_size, num_players):
         for row in range(self.rows):
             self.board.append([])
@@ -93,69 +81,9 @@ class Board:
                 cell = Cell(row, col, tilecolour, masterytile, piece, self.horizontal_offset, self.vertical_offset)
 
                 self.board[row].append(cell)
-        
-    def draw(self, window):
-        for row in range(self.rows):
-            for col in range(self.cols):
-                cell = self.board[row][col]
-                cell.draw(window)
 
     def draw_valid_moves(self, window, moves):
         for move in moves:
             row, col = move
             cell = self.get_cell(row, col)
             cell.draw_valid_move_marker(window)
-
-    def remove(self, piece):
-        row, col = piece.row, piece.col
-        cell = self.get_cell(row, col)
-        cell.remove_piece()
-
-        if piece is not None:
-            piece.player.lose_piece(master=piece.master)
-            self.players.update_active_number()
-
-    def location_on_movement_axis(self, piece, shift_size, positive):
-        shift = shift_size if positive else (-1 * shift_size)
-
-        if piece.lateral:
-            new_col = piece.col + shift
-            if new_col >= self.cols or new_col < 0:
-                return None
-            return piece.row, new_col
-        else:
-            new_row = piece.row + shift
-            if new_row >= self.rows or new_row < 0:
-                return None
-            return new_row, piece.col
-
-    def traverse_direction(self, piece, positive):
-        moves = []
-        shift_size = 1
-        encountered_piece = False
-
-        while not encountered_piece:
-            current_coords = self.location_on_movement_axis(piece, shift_size, positive)
-            if current_coords is None:
-                break
-            else:
-                current_row, current_col = current_coords
-
-            current_piece = self.get_piece(current_row, current_col)
-
-            if current_piece is not None:
-                encountered_piece = True
-            encountered_own = piece.same_side(current_piece)
-            permissible_shift = (piece.master == True or shift_size % 2 != 0)
-
-            if not encountered_own and permissible_shift:
-                moves += [(current_row, current_col)]
-
-            shift_size += 1
-        
-        return moves
-
-    def get_valid_moves(self, piece):
-        moves = self.traverse_direction(piece, True)
-        moves = moves + self.traverse_direction(piece, False)
-        return moves

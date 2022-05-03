@@ -10,8 +10,10 @@ class GameStatus(Enum):
     ONEPLAYER = 3
 
 class GameRenderer:
-    def __init__(self, window, config):
+    def __init__(self, window, horizontal_offset, vertical_offset):
         self.window = window
+        self.horizontal_offset = horizontal_offset
+        self.vertical_offset = vertical_offset
 
     def draw_board(self, board):
         for row in range(board.rows):
@@ -19,11 +21,17 @@ class GameRenderer:
                 cell = board.board[row][col]
                 cell.draw(self.window)
 
+    def draw_valid_moves(self, board, moves):
+        for move in moves:
+            row, col = move
+            cell = board.get_cell(row, col)
+            cell.draw_valid_move_marker(self.window)
+
 class GameManager:
     def __init__(self, window, config):
         self.config = config
         self.determine_offsets(config.board_size)
-        self.renderer = GameRenderer(window, config)
+        self.renderer = GameRenderer(window, self.horizontal_offset, self.vertical_offset)
         self.game = Game(config, self.horizontal_offset, self.vertical_offset)
 
     def determine_offsets(self, board_size):
@@ -34,7 +42,7 @@ class GameManager:
     def update(self):
         self.renderer.draw_board(self.game.board)
         self.display_info(self.renderer.window)
-        self.game.board.draw_valid_moves(self.renderer.window, self.game.valid_moves)
+        self.renderer.draw_valid_moves(self.game.board, self.game.valid_moves)
         pygame.display.update()
 
     def display_info(self, window):

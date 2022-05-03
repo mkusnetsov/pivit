@@ -1,4 +1,4 @@
-from .constants import RED, WHITE, DARKTILECOL, LIGHTTILECOL, STARTINGCOORDS, SQUARE_SIZE, FIELDWIDTH, FIELDHEIGHT
+from .constants import RED, WHITE, DARKTILECOL, LIGHTTILECOL, STARTINGCOORDS
 from .piece import Cell, Piece
 from .players import Player, Players
 
@@ -81,9 +81,3 @@ class Board:
                 cell = Cell(row, col, tilecolour, masterytile, piece, self.horizontal_offset, self.vertical_offset)
 
                 self.board[row].append(cell)
-
-    def draw_valid_moves(self, window, moves):
-        for move in moves:
-            row, col = move
-            cell = self.get_cell(row, col)
-            cell.draw_valid_move_marker(window)

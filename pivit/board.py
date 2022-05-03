@@ -78,6 +78,6 @@ class Board:
                     player = self.players[player_name]
                     piece = Piece(row, col, player, lateral)
 
-                cell = Cell(row, col, tilecolour, masterytile, piece, self.horizontal_offset, self.vertical_offset)
+                cell = Cell(row, col, tilecolour, masterytile, piece)
 
                 self.board[row].append(cell)

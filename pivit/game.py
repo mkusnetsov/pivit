@@ -1,6 +1,6 @@
 import pygame
 from enum import Enum
-from .constants import RED, WHITE, BLUE, FIELDWIDTH, FIELDHEIGHT, PANELWIDTH, PANELHEIGHT, SQUARE_SIZE
+from .constants import RED, WHITE, BLUE, GREY, FIELDWIDTH, FIELDHEIGHT, PANELWIDTH, PANELHEIGHT, SQUARE_SIZE
 from .board import Board
 
 class GameStatus(Enum):
@@ -10,6 +10,12 @@ class GameStatus(Enum):
     ONEPLAYER = 3
 
 class GameRenderer:
+    PADDING = 15
+    OUTLINE = 2
+    MAJORFACTOR = 0.9 # Length of the major axis of the diamond relative to the circle diameter
+    MINORFACTOR = 0.5 # Length of the minor axis of the diamond relative to the major axis
+    NEUTRALCOLOUR = GREY
+
     def __init__(self, window, horizontal_offset, vertical_offset):
         self.window = window
         self.horizontal_offset = horizontal_offset
@@ -26,6 +32,40 @@ class GameRenderer:
         centrey = cornery + SQUARE_SIZE // 2
         return centrex, centrey
 
+    def diamond_coords(self, radius, x, y, lateral):
+        halfmajorlen = radius * self.MAJORFACTOR
+        halfminorlen = halfmajorlen * self.MINORFACTOR
+
+        if lateral:
+            halfhorizontal = halfmajorlen
+            halfvertical = halfminorlen
+        else:
+            halfhorizontal = halfminorlen
+            halfvertical = halfmajorlen
+
+        diamondcoords = [
+            (x - halfhorizontal, y),
+            (x, y + halfvertical),
+            (x + halfhorizontal, y),
+            (x, y - halfvertical),
+        ]
+
+        return diamondcoords
+    
+    def draw_piece(self, piece, x, y):
+        if piece.master:
+            bg_colour = piece.colour
+            fg_colour = self.NEUTRALCOLOUR
+        else:
+            bg_colour = self.NEUTRALCOLOUR
+            fg_colour = piece.colour
+
+        radius = SQUARE_SIZE//2 - self.PADDING
+        diamondcoords = self.diamond_coords(radius, x, y, piece.lateral)
+
+        pygame.draw.circle(self.window, bg_colour, (x, y), radius + self.OUTLINE)
+        pygame.draw.polygon(self.window, fg_colour, diamondcoords)
+
     def draw_tile(self, row, col, tilecolour):
         cornerx, cornery =  self.calc_corner_pos(row, col)
         rect = pygame.Rect(cornerx, cornery, SQUARE_SIZE, SQUARE_SIZE)
@@ -34,7 +74,8 @@ class GameRenderer:
     def draw_cell(self, cell):
         self.draw_tile(cell.row, cell.col, cell.tilecolour)
         if cell.piece is not None:
-            cell.piece.draw(self.window)       
+            centrex, centrey = self.calc_centre_pos(cell.row, cell.col)
+            self.draw_piece(cell.piece, centrex, centrey)       
 
     def draw_board(self, board):
         for row in range(board.rows):

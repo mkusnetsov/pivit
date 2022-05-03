@@ -1,6 +1,6 @@
 import pygame
 from enum import Enum
-from .constants import RED, WHITE, FIELDWIDTH, FIELDHEIGHT, PANELWIDTH, PANELHEIGHT, SQUARE_SIZE
+from .constants import RED, WHITE, BLUE, FIELDWIDTH, FIELDHEIGHT, PANELWIDTH, PANELHEIGHT, SQUARE_SIZE
 from .board import Board
 
 class GameStatus(Enum):
@@ -42,11 +42,14 @@ class GameRenderer:
                 cell = board.board[row][col]
                 self.draw_cell(cell)
 
-    def draw_valid_moves(self, board, moves):
+    def draw_valid_move_marker(self, window, row, col):
+        centrex, centrey = self.calc_centre_pos(row, col)
+        pygame.draw.circle(window, BLUE, (centrex, centrey), 15)
+
+    def draw_valid_moves(self, moves):
         for move in moves:
             row, col = move
-            cell = board.get_cell(row, col)
-            cell.draw_valid_move_marker(self.window)
+            self.draw_valid_move_marker(self.window, row, col)
 
 class GameManager:
     def __init__(self, window, config):
@@ -63,7 +66,7 @@ class GameManager:
     def update(self):
         self.renderer.draw_board(self.game.board)
         self.display_info(self.renderer.window)
-        self.renderer.draw_valid_moves(self.game.board, self.game.valid_moves)
+        self.renderer.draw_valid_moves(self.game.valid_moves)
         pygame.display.update()
 
     def display_info(self, window):

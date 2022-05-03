@@ -1,5 +1,5 @@
 import pygame
-from .constants import RED, WHITE, FIELDWIDTH, FIELDHEIGHT, PANELWIDTH, PANELHEIGHT, SQUARE_SIZE, GameStatus
+from .constants import FIELDWIDTH, FIELDHEIGHT, SQUARE_SIZE, GameStatus
 from .board import Board
 from .render import GameRenderer
 
@@ -17,28 +17,9 @@ class GameManager:
 
     def update(self):
         self.renderer.draw_board(self.game.board)
-        self.display_info(self.renderer.window)
+        self.renderer.display_info(self.game)
         self.renderer.draw_valid_moves(self.game.valid_moves)
         pygame.display.update()
-
-    def display_info(self, window):
-        panelsurf = pygame.Surface((PANELWIDTH, PANELHEIGHT))
-        panelsurf.fill(color=RED)
-
-        fontsize = 15
-        font = pygame.font.Font(pygame.font.get_default_font(), fontsize)
-
-        turnstrings = [f"Current turn: {self.game.turn}", f"Current player: {self.game.current_player.name}"]
-        minionstrings = [f"{name} Minions: {self.game.players[name].minions}" for name in self.game.players.names]
-        mastersstrings = [f"{name} Masters: {self.game.players[name].masters}" for name in self.game.players.names]
-        infostrings = turnstrings + [i for pair in zip(minionstrings, mastersstrings) for i in pair]
-
-        inforenders = [font.render(s, True, WHITE) for s in infostrings]
-
-        for i in range(len(inforenders)):
-            panelsurf.blit(inforenders[i], dest = (10, 10 + (i * (fontsize + 15))))
-
-        window.blit(panelsurf, dest = (FIELDWIDTH, 0))
 
     def get_row_col_from_mouse(self, pos):
         voffset = self.vertical_offset

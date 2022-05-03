@@ -1,5 +1,5 @@
 import pygame
-from .constants import RED, WHITE, BLUE, GREY, SQUARE_SIZE, Colour
+from .constants import RED, WHITE, BLUE, GREY, SQUARE_SIZE,  FIELDWIDTH, PANELWIDTH, PANELHEIGHT, Colour
 
 class GameRenderer:
     PADDING = 15
@@ -11,6 +11,8 @@ class GameRenderer:
     LIGHTTILECOL = WHITE
     REDPLAYERCOL = RED
     WHITEPLATERCOL = WHITE
+    INFOPANELCOL = RED
+    INFOFONTCOL = WHITE
     TILECOLS = {Colour.TILEDARK: DARKTILECOL, Colour.TILELIGHT: LIGHTTILECOL}
     PLAYERCOLS = {Colour.PLAYERRED: REDPLAYERCOL, Colour.PLAYERWHITE: WHITEPLATERCOL}
 
@@ -89,3 +91,22 @@ class GameRenderer:
         for move in moves:
             row, col = move
             self.draw_valid_move_marker(self.window, row, col)
+
+    def display_info(self, game):
+        panelsurf = pygame.Surface((PANELWIDTH, PANELHEIGHT))
+        panelsurf.fill(color=self.INFOPANELCOL)
+
+        fontsize = 15
+        font = pygame.font.Font(pygame.font.get_default_font(), fontsize)
+
+        turnstrings = [f"Current turn: {game.turn}", f"Current player: {game.current_player.name}"]
+        minionstrings = [f"{name} Minions: {game.players[name].minions}" for name in game.players.names]
+        mastersstrings = [f"{name} Masters: {game.players[name].masters}" for name in game.players.names]
+        infostrings = turnstrings + [i for pair in zip(minionstrings, mastersstrings) for i in pair]
+
+        inforenders = [font.render(s, True, self.INFOFONTCOL) for s in infostrings]
+
+        for i in range(len(inforenders)):
+            panelsurf.blit(inforenders[i], dest = (10, 10 + (i * (fontsize + 15))))
+
+        self.window.blit(panelsurf, dest = (FIELDWIDTH, 0))

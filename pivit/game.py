@@ -15,11 +15,32 @@ class GameRenderer:
         self.horizontal_offset = horizontal_offset
         self.vertical_offset = vertical_offset
 
+    def calc_corner_pos(self, row, col):
+        cornerx = self.horizontal_offset + col * SQUARE_SIZE
+        cornery = self.vertical_offset + row * SQUARE_SIZE
+        return cornerx, cornery
+
+    def calc_centre_pos(self, row, col):
+        cornerx, cornery = self.calc_corner_pos(row, col)
+        centrex = cornerx + SQUARE_SIZE // 2
+        centrey = cornery + SQUARE_SIZE // 2
+        return centrex, centrey
+
+    def draw_tile(self, row, col, tilecolour):
+        cornerx, cornery =  self.calc_corner_pos(row, col)
+        rect = pygame.Rect(cornerx, cornery, SQUARE_SIZE, SQUARE_SIZE)
+        pygame.draw.rect(self.window, tilecolour, rect)
+
+    def draw_cell(self, cell):
+        self.draw_tile(cell.row, cell.col, cell.tilecolour)
+        if cell.piece is not None:
+            cell.piece.draw(self.window)       
+
     def draw_board(self, board):
         for row in range(board.rows):
             for col in range(board.cols):
                 cell = board.board[row][col]
-                cell.draw(self.window)
+                self.draw_cell(cell)
 
     def draw_valid_moves(self, board, moves):
         for move in moves:

@@ -27,14 +27,14 @@ class Cell:
         self.centrex = self.cornerx + SQUARE_SIZE // 2
         self.centrey = self.cornery + SQUARE_SIZE // 2
 
-    def _draw_tile(self, window):
-        rect = pygame.Rect(self.cornerx, self.cornery, SQUARE_SIZE, SQUARE_SIZE)
-        pygame.draw.rect(window, self.tilecolour, rect)
+    # def _draw_tile(self, window):
+    #     rect = pygame.Rect(self.cornerx, self.cornery, SQUARE_SIZE, SQUARE_SIZE)
+    #     pygame.draw.rect(window, self.tilecolour, rect)
 
-    def draw(self, window):
-        self._draw_tile(window)
-        if self.piece is not None:
-            self.piece.draw(window)
+    # def draw(self, window):
+    #     self._draw_tile(window)
+    #     if self.piece is not None:
+    #         self.piece.draw(window)
 
     def draw_valid_move_marker(self, window):
         pygame.draw.circle(window, BLUE, (self.centrex, self.centrey), 15)

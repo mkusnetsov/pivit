@@ -1,0 +1,5 @@
+name: pivitgame
+dependencies:
+  - pip:
+    - pygame
+    - pygame-menu
